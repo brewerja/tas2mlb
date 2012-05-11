@@ -1,0 +1,159 @@
+h1, h3 {
+    color: white;
+    }
+
+body {
+	text-align: center; /* required for centering the page in IE */
+	font-family: sans-serif;
+   background-color: #000066;
+	}
+.sub {
+	padding: 0 0 0 10px;
+	}
+
+#wrapper {
+	width: 900px;
+	margin: 0 auto; /* centering the page */
+	text-align: left;
+	}
+#header {
+	text-align:center;
+   font-size:12px;
+   padding: 0 0 20px 0;
+	}	
+    
+#hometeam {
+    position: absolute;
+    top: 55px;
+    right: 80px;
+    color:white;
+    } 
+
+#awayteam {
+    position: absolute;
+    top: 55px;
+    left: 80px;
+    color:white;
+    }    
+    
+#linescore tr > td:first-child { 
+    text-align:left;
+    font-weight:bold;
+    padding:0 6px;
+    width: auto;
+    }
+
+#linescore {
+    margin-left:auto;
+    margin-right:auto;
+    }    
+
+#linescore td{
+    background-color:white;
+    width: 20px;
+    }
+    
+#linescore th {
+    background-color:#cc0000;
+    color:white;
+    font-weight:normal;
+    border: 0;
+    }
+
+#linescore th, #linescore td, #linescore tr {
+    border: 1px solid #dedede;
+    }
+
+.b {
+    font-weight: bold;
+    }
+    
+.score {
+    font-weight: bold;
+    background-color: #dedede !important;
+    }
+    
+table {
+    border-collapse: collapse;
+    }
+
+.batting_table, .pitching_table {
+    width: 100%;
+    }
+    
+    
+tr.totals {
+    font-weight:bold;
+    }
+
+.batting_table th+th, .batting_table td+td {text-align: center; width:20px;}
+.batting_table th+th+th+th+th+th+th+th+th, .batting_table  td+td+td+td+td+td+td+td+td {text-align: right; width:27px;}
+.batting_table th {background-color:#dedede;}
+
+.pitching_table th+th, .pitching_table td+td {text-align: center; width:20px;}
+.pitching_table th+th+th+th+th+th+th+th+th, .pitching_table  td+td+td+td+td+td+td+td+td {text-align: right; width:27px;}
+.pitching_table th {background-color:#dedede;}
+
+h4 { 
+    padding: 0px;
+    margin: 10px 0 0 0;
+    text-transform: uppercase;
+    }
+
+dd {
+    margin: 0px;
+    padding: 0px;
+    }
+	
+dt {
+    font-weight: bold;
+    float:left;
+    }
+
+dl {
+    padding: 0px;
+    margin: 0px;
+    }
+
+#box_score_container {
+	 margin: 0 auto; /* centering the page */
+    font-size: 11px;
+    width: 700px;
+    background-color: white;
+    }
+
+#pitching_left, #batting_left {
+    width:341px;
+	 float: left;    
+    padding: 6px 3px 10px 6px;
+    }
+#pitching_right, #batting_right {
+    width:341px;
+    float:right;
+    padding:6px 6px 10px 3px;
+	}
+    
+#pitching_container {
+	margin: 0 auto; /* centering the page */
+   width: 700px;
+   clear:both;
+	}
+	
+#pitching_game_container {
+	clear: both;
+	padding: 0px 6px;
+	}
+
+#footer {
+	clear:both;
+	background: white;
+	font-weight: bold;
+	padding: 6px;
+   width: 688px;
+   margin: 0px auto;
+   font-size: 11px;
+	}
+
+#footer p {
+    margin: 0px;
+    }

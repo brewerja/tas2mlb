@@ -1,0 +1,130 @@
+body
+{
+	text-align: center; /* required for centering the page in IE */
+	font-family: sans-serif;
+  	background-color: #000066;
+}
+h1, h3 {
+    color: white;
+    }
+
+#header {
+	text-align:center;
+   font-size:12px;
+   padding: 0 0 20px 0;
+
+	}
+
+#wrapper
+{
+	width: 700px;
+	margin: 0 auto; /* centering the page */
+	text-align: left;
+}
+
+table
+{
+	border-collapse: collapse;
+	font-size: 11px;
+	border-color: #DCDCDC;
+}
+
+#playbyplay
+{
+	border: 1px solid #DCDCDC;
+	
+}
+#playbyplay td
+{
+	padding: 2px;
+border: 1px solid #DCDCDC;
+}
+
+#linescore tr > td:first-child { 
+    text-align:left;
+    font-weight:bold;
+    padding:0 6px;
+    width: auto;
+    }
+
+#linescore {
+    margin-left:auto;
+    margin-right:auto;
+    }    
+
+#linescore td{
+    background-color:white;
+    width: 20px;
+    }
+    
+#linescore th {
+    background-color:#cc0000;
+    color:white;
+    font-weight:normal;
+    border: 0;
+    }
+
+#linescore th, #linescore td, #linescore tr {
+    border: 1px solid #dedede;
+    }
+
+.b {
+    font-weight: bold;
+    }
+    
+.score {
+    font-weight: bold;
+    background-color: #dedede !important;
+    }
+
+.RUNS {text-align: center; width:35px;}
+.SCORE_HEADER {text-align: center;}
+
+.EJECTED
+{
+	color: #FF981A;
+	font-weight: bold;
+}
+
+.ON
+{
+	background-color: #FFFFFF;
+}
+
+.OFF
+{
+	background-color: #ECECEC;
+}
+
+.SCORING
+{
+	color: #007F12;
+	font-weight: bold;
+}
+
+.RELIEVER
+{
+	color: #C00000;
+	font-weight: bold;
+}
+
+.WRAPPER
+{
+	background-color: #C1C1C1;
+	font-weight: bold;
+	color: #000000;
+}
+
+.VISITOR
+{
+	background-color: #051C43;
+	color: #FFFFFF;
+	font-weight: bold;
+}
+
+.HOME
+{
+	background-color: #000000;
+	color: #FFFFFF;
+	font-weight: bold;
+}
