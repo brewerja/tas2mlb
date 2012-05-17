@@ -12,8 +12,9 @@ from xml.sax import saxutils
 from team import Player, Event
 from utils import getShortName
 
+
 class ParseStats(saxutils.handler.ContentHandler):
-    
+
     def __init__(self, game, home, away):
         # The Game and Team objects for populating.
         self.game, self.home, self.away = game, home, away
@@ -24,17 +25,17 @@ class ParseStats(saxutils.handler.ContentHandler):
         self.wasBatterAction = 0
         self.activeError = 0
         self.activeErringFielders = []
-        
+
     def startElement(self, name, attrs):
         # Game Stats
         if (name == 'venue'):
             self.game.gameid = attrs.get('gameid')
             self.away.id = attrs.get('visid')
             self.home.id = attrs.get('homeid')
-            self.game.visname = attrs.get('visname')            
+            self.game.visname = attrs.get('visname')
             self.game.homename = attrs.get('homename')
             self.away.name = getShortName(self.game.visname)
-            self.home.name = getShortName(self.game.homename)                              
+            self.home.name = getShortName(self.game.homename)
             date = attrs.get('date').split('/')
             self.game.date = datetime.date(int(date[2]),int(date[0]),\
                                            int(date[1]))

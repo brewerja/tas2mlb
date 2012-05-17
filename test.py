@@ -3,20 +3,23 @@
 import pickle
 from bsddb3 import db
 
+
 class Player:
-    def __init__(self,gameID,name,hits):
+    def __init__(self, gameID, name, hits):
         self.gameID = gameID
         self.name = name
         self.hits = hits
-        self.string = gameID+name
+        self.string = gameID + name
+
 
 def getName(player):
     return pickle.loads(player).name
 
+
 def getGame(player):
     return pickle.loads(player).game
 
-if __name__=='__main__':
+if __name__ == '__main__':
 
     playerDB = db.DB()
     playerDB.open(None, None, db.DB_RECNO, db.DB_CREATE)
@@ -45,19 +48,20 @@ if __name__=='__main__':
     p14 = Player('fxvi727', 'Nick Boullosa', '1')
     p15 = Player('fxvi727', 'Ryan Camp', '1')
 
-    players = (p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15)
+    players = (p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14,
+               p15)
 
     for each in players:
         playerDB.append(pickle.dumps(each))
 
-    playerDB.associate(nameDB,getName)
-    playerDB.associate(gameDB,getGame)
+    playerDB.associate(nameDB, getName)
+    playerDB.associate(gameDB, getGame)
 
     cursor = playerDB.cursor()
     rec = cursor.first()
     print "------------ Primary DB ---------------"
     while rec:
-        print str(rec[0])+' '+getName(rec[1])
+        print str(rec[0]) + ' ' + getName(rec[1])
         rec = cursor.next()
 
     print "---------------------------------------"

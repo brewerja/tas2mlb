@@ -12,13 +12,14 @@ from utils import printTeamRecord, printTeamStreak, printAVG, printHittingTotal
 from utils import prettyInning, translateNarrative, printErrors
 from utils import printERA, printPitcherRecord, printSaves, printPassedBalls
 
+
 class BoxPrinter:
-    
+
     def __init__(self, databases):
         self.BATTERS_DB = databases[0]
         self.PITCHERS_DB = databases[1]
         self.WL_DB = databases[2]
-        
+
     def printLinescore(self, away, home):
         """ Prints an HTML table linescore given 2 Team objects. """
         print "<table id=\"linescore\">"
@@ -26,7 +27,7 @@ class BoxPrinter:
         self.printLine(away)
         self.printLine(home)
         print "</table>"
-        
+
     def printLineHeader(self, num_inn):
         """ Prints an HTML table header for a linescore. """
         print "<tr>",
@@ -35,7 +36,7 @@ class BoxPrinter:
             sys.stdout.write("<th>%s</th>" % i)
         print "<th></th><th>R</th><th>H</th><th>E</th>",
         print "</tr>"
-        
+
     def printLine(self, t):
         """ Prints an HTML table row given a Team object """
         print "<tr>",
@@ -48,21 +49,21 @@ class BoxPrinter:
         print "<td></td><td class=\"score\">%(r)2d</td><td>%(h)2d</td><td>%(e)\
                2d</td>" % {'r': t.runs, 'h': t.hits, 'e': t.errs},
         print "</tr>"
-        
+
     def printBattingTable(self, t, seasonTotals=1):
-        """ Prints a box score batting table in HTML, given a Team object. """     
-        
+        """ Prints a box score batting table in HTML, given a Team object. """
+
         # Opening <table> tag and header row.
         print "<table class=\"batting_table\">"
         print "<tr><th>" + str(t.name) + "</th><th>AB</th><th>R</th><th>H</th>\
         <th>RBI</th><th>BB</th><th>SO</th><th>LOB</th>"
-        
+
         # If season totals are desired, add a column for AVG.
         if seasonTotals:
             sys.stdout.write("<th>AVG</th></tr>")
         else:
             sys.stdout.write("</tr>")
-        
+
         # Iterate through the lineup, populating the various columns.
         for i in range(1, t.getLineupLength() + 1):
             sub = 0
@@ -70,7 +71,7 @@ class BoxPrinter:
                 # Retrieve Player object.
                 p = t.players[pID]
                 nameprefix = "<td>"
-                
+
                 # If player is not a starter, add CSS class for indenting.
                 if sub:
                     nameprefix = "<td class=\"sub\">"
@@ -87,7 +88,7 @@ class BoxPrinter:
                             if e.name == p.id:
                                 nameprefix += alphabet[num] + "-"
                                 break
-                            
+
                 # Print out positions played in order (e.g. 1B-3B).
                 positions = ""
                 if -1 in p.poslist:
@@ -97,57 +98,57 @@ class BoxPrinter:
                     if pos != p.poslist[-1]:
                         positions += "-"
                 tmpname = nameprefix + p.name + ", " + positions
-                
+
                 # Turn on sub flag for remaining players within lineup spot.
                 sub = 1
-                
+
                 dict = {'td_name': tmpname, 'ab': p.hitting.ab, \
                         'r': p.hitting.r, 'h': p.hitting.h, \
                         'rbi': p.hitting.rbi, 'bb': p.hitting.bb, \
                         'so': p.hitting.so, 'lob': p.hitting.lob}
-                print "<tr>%(td_name)s</td><td>%(ab)s</td><td>%(r)s</td><td>\
-                       %(h)s</td><td>%(rbi)s</td><td>%(bb)s</td><td>%(so)s</td>\
-                       <td>%(lob)s</td>" % dict,
-                
+                print ("<tr>%(td_name)s</td><td>%(ab)s</td><td>%(r)s</td><td>"
+                       "%(h)s</td><td>%(rbi)s</td><td>%(bb)s</td><td>%(so)s"
+                       "</td><td>%(lob)s</td>") % dict,
+
                 # If season totals are desired populate the AVG column.
                 if seasonTotals:
                     dict['avg'] = printAVG(self.BATTERS_DB, str(p.name), \
                                         int(p.date))
                     print "<td>%(avg)s</td></tr>\n" % dict,
                 else:
-                    print "<tr>\n",       
-                    
-                # Add up individual LOB for print total in final row.         
+                    print "<tr>\n",
+
+                # Add up individual LOB for print total in final row.
                 t.playerlob += p.hitting.lob
-        
+
         # Print team totals for table's final row and close </table> tag.
-        dict = {'ab': t.ab, 'r': t.runs, 'h': t.hits, 'rbi': t.rbi, \
-                'bb': t.bb, 'so':t.so, 'lob':t.playerlob}        
-        print "<tr class=\"totals\"><td>Totals</td><td>%(ab)s</td><td>%(r)s\
-               </td><td>%(h)s</td><td>%(rbi)s</td><td>%(bb)s</td><td>%(so)s\
-	       </td><td>%(lob)s</td></tr>" % dict
+        dict = {'ab': t.ab, 'r': t.runs, 'h': t.hits, 'rbi': t.rbi, 'bb': t.bb,
+                'so': t.so, 'lob': t.playerlob}
+        print ("<tr class=\"totals\"><td>Totals</td><td>%(ab)s</td><td>%(r)s"
+               "</td><td>%(h)s</td><td>%(rbi)s</td><td>%(bb)s</td><td>%(so)s"
+               "</td><td>%(lob)s</td></tr>") % dict
         print "</table>"
-        
+
     def printPitchingTable(self, t, seasonTotals=1):
         """ Prints a box score pitching table in HTML, given a Team object. """
-        
+
         # Opening <table> tag and header row.
         print "<table class=\"pitching_table\">"
         print "<tr><th>" + str(t.name) + "</th><th>IP</th><th>H</th><th>R</th>\
                <th>ER</th><th>BB</th><th>SO</th><th>HR</th>",
-        
+
         # If season totals are desired, add a column for ERA.
         if seasonTotals:
             print "<th>ERA</th></tr>"
         else:
             print "</tr>"
-        
-        # Iterate through the pitchers used, populating the various columns.    
+
+        # Iterate through the pitchers used, populating the various columns.
         for i in range(1, t.getPitchingOrderLength() + 1):
             for pID in t.getPitchingSpot(i):
                 # Retrieve Player object.
                 p = t.players[pID]
-                
+
                 # If pitcher was tagged with the W, L, or S, append to name.
                 if p.pitching.win != 0:
                     if seasonTotals:
@@ -170,7 +171,7 @@ class BoxPrinter:
                     namesuffix = " (S, " + saves + ")"
                 else:
                     namesuffix = ''
-                    
+
                 tmpname = p.name + namesuffix
                 dict = {'name': tmpname, 'ip': p.pitching.ip, \
                         'h': p.pitching.h, 'r': p.pitching.r, \
@@ -179,30 +180,30 @@ class BoxPrinter:
                 print "<tr><td>%(name)s</td><td>%(ip)s</td><td>%(h)s</td><td>\
                        %(r)s</td><td>%(er)s</td><td>%(bb)s</td><td>%(so)s</td>\
                        <td>%(hr)s</td>" % dict,
-                
+
                 # If season totals are desired, populate the ERA column.
                 if seasonTotals:
                     dict['era'] = printERA(self.PITCHERS_DB, str(p.name), \
                                            int(p.date))
                     print "<td>%(era)s</td></tr>\n" % dict,
                 else:
-                    print "</tr>" 
-        
+                    print "</tr>"
+
         # No team totals are printed in a pitchers table, close </table> tag.
         print "</table>"
-        
+
     def printPitchingParagraph(self, teams, game):
         """ Prints the paragraph section of the pitching box score. """
-        
+
         # Print pitcher texts (e.g. "Rivera pitched to 2 batters in the 9th.").
         # These notes are generated when a pitcher is relieved before recording
         # any outs in the inning.
-        teams_with_pitchertexts = [t for t in teams if t.pitcherTexts != [] ]
+        teams_with_pitchertexts = [t for t in teams if t.pitcherTexts != []]
         if teams_with_pitchertexts != []:
             print "<p>"
             # Combine both teams' list of texts and sort in game order.
             eventTexts = teams[0].pitcherTexts + teams[1].pitcherTexts
-            eventTexts.sort(key = lambda x: x.play)
+            eventTexts.sort(key=lambda x: x.play)
             for e in eventTexts:
                 # Print texts, adjusting for grammar difference.
                 if e.battersSincePitchingChange == 1:
@@ -213,11 +214,10 @@ class BoxPrinter:
                 print e.name + text + prettyInning(e.inning) + "."
                 print "<br/>"
             print "</p>"
-        
-        
+
         # Start a definition list for pitching items.
         print "<dl>"
-        
+
         # Wild pitches.
         teams_with_wp = [t for t in teams if t.wp != 0]
         if teams_with_wp != []:
@@ -234,12 +234,12 @@ class BoxPrinter:
                 print p.id,
                 if p.pitching.wp > 1:
                     print p.pitching.wp,
-                if p != pitchers_with_wp[-1] :
+                if p != pitchers_with_wp[-1]:
                     sys.stdout.write(", ")
                 else:
                     sys.stdout.write(".")
             print "</dd>"
-            
+
         # Balks.
         teams_with_balks = [t for t in teams if t.balks != 0]
         if teams_with_balks != []:
@@ -256,18 +256,18 @@ class BoxPrinter:
                 print p.id,
                 if p.pitching.bk > 1:
                     print p.pitching.bk,
-                if p != pitchers_with_balks[-1] :
+                if p != pitchers_with_balks[-1]:
                     sys.stdout.write(", ")
                 else:
                     sys.stdout.write(".")
-            print "</dd>"            
-            
+            print "</dd>"
+
         # Intentional walks.
         teams_with_ibb = [x for x in teams if x.been_ibb != 0]
         if teams_with_ibb != []:
             print "<dt>IBB:&nbsp;</dt>"
             print "<dd>",
-            list_been_ibb = []    
+            list_been_ibb = []
             for team in teams_with_ibb:
                 for event in team.events:
                     if event.type == 'ibb':
@@ -279,14 +279,14 @@ class BoxPrinter:
                     sys.stdout.write(", ")
                 else:
                     sys.stdout.write(".")
-            print "</dd>"             
-            
+            print "</dd>"
+
         # Hit by pitches.
         teams_with_hbp = [x for x in teams if x.been_hbp != 0]
         if teams_with_hbp != []:
             print "<dt>HBP:&nbsp;</dt>"
             print "<dd>",
-            list_been_hbp = []    
+            list_been_hbp = []
             for team in teams_with_hbp:
                 for event in team.events:
                     if event.type == 'hbp':
@@ -299,13 +299,13 @@ class BoxPrinter:
                 else:
                     sys.stdout.write(".")
             print "</dd>"
-            
+
         # Pitches-strikes.
         firstpitcher = teams[0].getPitchingSpot(1)
         if firstpitcher != []:
             player = teams[0].players[firstpitcher[0]]
             # Check to see if pitches are being tracked in this game.
-            if player.pitching.pitches != None: 
+            if player.pitching.pitches != None:
                 print "<dt>Pitches-strikes:&nbsp;</dt>"
                 print "<dd>",
                 for t in teams:
@@ -321,7 +321,7 @@ class BoxPrinter:
                         else:
                             print ", "
                 print "</dd>"
-            
+
             # Groundouts-flyouts.
             print "<dt>Groundouts-flyouts:&nbsp;</dt>"
             print "<dd>",
@@ -336,8 +336,8 @@ class BoxPrinter:
                         sys.stdout.write(".")
                     else:
                         sys.stdout.write(", ")
-            print "</dd>" 
-            
+            print "</dd>"
+
             # Batters faced.
             print "<dt>Batters faced:&nbsp;</dt>"
             print "<dd>",
@@ -365,7 +365,7 @@ class BoxPrinter:
             if pitchers_with_inherited != []:
                 print "<dt>Inherited runners-scored:&nbsp;</dt>"
                 print "<dd>",
-                for p in pitchers_with_inherited:   
+                for p in pitchers_with_inherited:
                     print p.id
                     sys.stdout.write(str(p.pitching.inheritr) + "-" + \
                                      str(p.pitching.inherits))
@@ -373,8 +373,8 @@ class BoxPrinter:
                         print "."
                     else:
                         print ", "
-                print "</dd>" 
-            
+                print "</dd>"
+
         # Umpires.
         umps = game.umpires
         if umps != []:
@@ -386,42 +386,42 @@ class BoxPrinter:
                     sys.stdout.write(". ")
                 else:
                     sys.stdout.write(".")
-            print "</dd>" 
-        
+            print "</dd>"
+
         # Weather.
         if game.weather != None:
             print "<dt>Weather:&nbsp;</dt>"
             print "<dd>",
-            sys.stdout.write(game.weather + ".")                
-            print "</dd>" 
-        
+            sys.stdout.write(game.weather + ".")
+            print "</dd>"
+
         # Time (duration).
         if game.duration != None:
             print "<dt>T:&nbsp;</dt>"
             print "<dd>",
-            sys.stdout.write(game.duration + ".")                
+            sys.stdout.write(game.duration + ".")
             print "</dd>"
 
         # Attendance.
         if int(game.attend) != 0:
             print "<dt>Att:&nbsp;</dt>"
             print "<dd>",
-            sys.stdout.write(game.attend + ".")                   
+            sys.stdout.write(game.attend + ".")
             print "</dd>"
-        
+
         # Date.
         gameday = game.date
         sys.stdout.write("<dt>" + gameday.strftime("%B %e, %Y") + \
                          "&nbsp;</dt>\n<dd>&nbsp;</dd>")
-        
+
         # Close out definition list.
         print
         print "</dl>"
-                
+
     def printBattingParagraph(self, t):
-        
+
         write = sys.stdout.write
-        
+
         # Pinch Runners (1,2,3) and Pinch Hitters (a,b,c)
         if (len(t.pinchrunners) != 0 or len(t.pinchhitters) != 0):
             print "<p>"
@@ -431,7 +431,7 @@ class BoxPrinter:
                     narr = translateNarrative(e.narrative)
                     print alphabet[num] + "-" + narr.capitalize() + " for " + \
                     e.subfor + " in the " + prettyInning(e.inning) + ". "
-                        
+
             if len(t.pinchrunners) != 0:
                 if len(t.pinchhitters) != 0:
                     print "<br/>"
@@ -439,18 +439,18 @@ class BoxPrinter:
                     print str(num + 1) + "-" + "Ran for " + e.subfor + \
                     " in the " + prettyInning(e.inning) + ". "
             print "</p>"
-        
+
         # Note that in a perfect game there will not be a batting section!
         if len(t.doubles) != 0 or len(t.triples) != 0 or len(t.homeruns) != 0 \
         or t.hits != 0 or t.rbi != 0 or len(t.rbi2out) != 0 or len(t.lisp2out)\
         != 0 or len(t.batters_with_sh) != 0 or len(t.batters_with_sf) != 0 or \
         len(t.batters_with_gidp) != 0 or t.wrisp[0] != '0' or t.lob != 0:
-            
+
             print "<h4>Batting</h4>"
             print "<dl>"
-    
+
             # Doubles, listed in game order.
-            if len(t.doubles) != 0:        
+            if len(t.doubles) != 0:
                 print "<dt>2B:&nbsp;</dt>"
                 print "<dd>",
                 for pID in t.doubles:
@@ -460,7 +460,7 @@ class BoxPrinter:
                     doubles = [e for e in p.events if e.type == 'double']
                     if len(doubles) != 1:
                         # Step 2. If he has multiples, print the number.
-                        print " "+str(len(doubles)),
+                        print " " + str(len(doubles)),
                         # Step 3. Print the total for the season.
                         write(" (" + printHittingTotal(self.BATTERS_DB, \
                               str(p.name), int(p.date), 'double') + ", ")
@@ -479,7 +479,7 @@ class BoxPrinter:
                     else:
                         write(", ")
                 print "</dd>"
-            
+
             # Triples, listed in game order.
             if len(t.triples) != 0:
                 print "<dt>3B:&nbsp;</dt>"
@@ -489,7 +489,7 @@ class BoxPrinter:
                     p = t.players[pID]
                     triples = [e for e in p.events if e.type == 'triple']
                     if len(triples) != 1:
-                        print " "+str(len(triples)),
+                        print " " + str(len(triples)),
                         write(" (" + printHittingTotal(self.BATTERS_DB, \
                               str(p.name), int(p.date), 'triple') + ", ")
                         for e in triples:
@@ -506,7 +506,7 @@ class BoxPrinter:
                     else:
                         write(", ")
                 print "</dd>"
-            
+
             # Homeruns, listed in game order.
             if len(t.homeruns) != 0:
                 print "<dt>HR:&nbsp;</dt>"
@@ -516,7 +516,7 @@ class BoxPrinter:
                     p = t.players[pID]
                     homeruns = [e for e in p.events if e.type == 'hr']
                     if len(homeruns) != 1:
-                        print " "+str(len(homeruns)),
+                        print " " + str(len(homeruns)),
                         write(" (" + printHittingTotal(self.BATTERS_DB, \
                               str(p.name), int(p.date), 'hr') + ", ")
                         for e in homeruns:
@@ -537,8 +537,8 @@ class BoxPrinter:
                         write(".")
                     else:
                         write(", ")
-                print "</dd>"        
-    
+                print "</dd>"
+
             # Total bases per player, listed in lineup order.
             if t.hits != 0:
                 batters_with_hits = []
@@ -546,7 +546,7 @@ class BoxPrinter:
                     for pID in spot:
                         if t.players[pID].hitting.h != 0:
                             batters_with_hits.append(t.players[pID])
-                            
+
                 print "<dt>TB:&nbsp;</dt>"
                 print "<dd>",
                 for p in batters_with_hits:
@@ -560,9 +560,9 @@ class BoxPrinter:
                     else:
                         write(".")
                 print "</dd>"
-                
+
             # RBI, listed in game order.
-            if t.rbi != 0:                      
+            if t.rbi != 0:
                 print "<dt>RBI:&nbsp;</dt>"
                 print "<dd>",
                 for pID in t.batters_with_rbi:
@@ -571,19 +571,19 @@ class BoxPrinter:
                         write(pID + " " + str(rbi))
                     else:
                         write(pID)
-                    
+
                     write(" (" + printHittingTotal(self.BATTERS_DB, \
                           str(t.players[pID].name), int(t.players[pID].date),\
-                          'rbi') + ")") 
-                    
+                          'rbi') + ")")
+
                     if pID != t.batters_with_rbi[-1]:
                         write(", ")
                     else:
                         write(".")
-                print "</dd>"             
-                
+                print "</dd>"
+
             # 2-out RBI, listed in game order.
-            if len(t.rbi2out) != 0:                      
+            if len(t.rbi2out) != 0:
                 print "<dt>2-out RBI:&nbsp;</dt>"
                 print "<dd>",
                 for pID in t.rbi2out:
@@ -595,11 +595,11 @@ class BoxPrinter:
                     if pID != t.rbi2out[-1]:
                         write("; ")
                     else:
-                        write(".")                    
+                        write(".")
                 print "</dd>"
-                
+
             # Runners left in scoring position, 2 out, listed in game order.
-            if len(t.lisp2out) != 0:                      
+            if len(t.lisp2out) != 0:
                 print "<dt>Runners left in scoring position, 2 out:&nbsp;</dt>"
                 print "<dd>",
                 for pID in t.lisp2out:
@@ -611,11 +611,11 @@ class BoxPrinter:
                     if pID != t.lisp2out[-1]:
                         write("; ")
                     else:
-                        write(".")                    
-                print "</dd>"            
-                
+                        write(".")
+                print "</dd>"
+
             # Sacrifice hits (bunts), listed in game order.
-            if len(t.batters_with_sh) != 0:                      
+            if len(t.batters_with_sh) != 0:
                 print "<dt>S:&nbsp;</dt>"
                 print "<dd>",
                 for pID in t.batters_with_sh:
@@ -629,9 +629,9 @@ class BoxPrinter:
                     else:
                         write(".")
                 print "</dd>"
-                
+
             # Sacrifice flies, listed in game order.
-            if len(t.batters_with_sf) != 0:                      
+            if len(t.batters_with_sf) != 0:
                 print "<dt>SF:&nbsp;</dt>"
                 print "<dd>",
                 for pID in t.batters_with_sf:
@@ -645,9 +645,9 @@ class BoxPrinter:
                     else:
                         write(".")
                 print "</dd>"
-                
+
             # Ground into double plays, listed in game order.
-            if len(t.batters_with_gidp) != 0:                      
+            if len(t.batters_with_gidp) != 0:
                 print "<dt>GIDP:&nbsp;</dt>"
                 print "<dd>",
                 for pID in t.batters_with_gidp:
@@ -661,30 +661,30 @@ class BoxPrinter:
                     else:
                         write(".")
                 print "</dd>"
-                
+
             # Team with runners in scoring position (e.g. 2-for-3).
-            if t.wrisp[0] != 'None':                  
+            if t.wrisp[0] != 'None':
                 print "<dt>Team RISP:&nbsp;</dt>"
                 print "<dd>",
                 write(t.wrisp[0] + "-for-" + t.wrisp[1] + ".")
                 print "</dd>"
-                
+
             # Team left on base.
             if t.lob != 0:
                 print "<dt>Team LOB:&nbsp;</dt>"
                 print "<dd>",
                 write(str(t.lob) + ".")
-                print "</dd>"                          
-            
+                print "</dd>"
+
             print "</dl>"
-        
+
         print
-        
+
         # Make sure there are baserunning events to display.
-        if t.sb != 0 or t.cs != 0 or t.pickedoff != 0: 
+        if t.sb != 0 or t.cs != 0 or t.pickedoff != 0:
             print "<h4>Baserunning</h4>"
             print "<dl>"
-            
+
             # Stolen bases, listed in game order.
             if t.sb != 0:
                 print "<dt>SB:&nbsp;</dt>"
@@ -693,32 +693,34 @@ class BoxPrinter:
                     p = t.players[pID]
                     stolenbases = [e for e in p.events if e.type == 'sb']
                     sb = t.players[pID].hitting.sb
-                    
+
                     write(pID + " ")
-                    
+
                     if sb != 1:
                         write(str(sb) + " ")
-                                    
+
                     write("(" + printHittingTotal(self.BATTERS_DB, \
                           str(p.name), int(p.date), 'sb') + ", ")
-                    
+
                     for e in stolenbases:
                         try:
                             write(e.base + " off " + e.pitcher + "/" + \
                                   e.catcher)
-                        except:#FIXME: for failed pickoff attempts where the catcher is not involved
+                        except:
+                            # FIXME: for failed pickoff attempts where the
+                            # catcher is not involved
                             write(e.base + " off " + e.pitcher)
                         if e != stolenbases[-1]:
                             write(", ")
                         else:
                             write(")")
-                    
+
                     if pID != t.players_with_sb[-1]:
                         write(", ")
                     else:
                         write(".")
                 print "</dd>"
-                
+
             # Caught Stealings, listed in game order.
             if t.cs != 0:
                 print "<dt>CS:&nbsp;</dt>"
@@ -727,31 +729,32 @@ class BoxPrinter:
                     p = t.players[pID]
                     caughtstealings = [e for e in p.events if e.type == 'cs']
                     cs = t.players[pID].hitting.cs
-                    
+
                     write(pID + " ")
-                    
+
                     if cs != 1:
                         write(str(cs) + " ")
-                                    
+
                     write("(" + printHittingTotal(self.BATTERS_DB, \
                           str(p.name), int(p.date), 'cs') + ", ")
-                    
+
                     for e in caughtstealings:
                         if e.catcher != 0:
-                            write(e.base + " by " + e.pitcher + "/" + e.catcher)
+                            write(e.base + " by " + e.pitcher + "/" +
+                                  e.catcher)
                         else:
                             write(e.base + " by " + e.pitcher + " POCS")
                         if e != caughtstealings[-1]:
                             write(", ")
                         else:
                             write(")")
-                    
+
                     if pID != t.players_with_cs[-1]:
                         write(", ")
                     else:
                         write(".")
-                print "</dd>"      
-                
+                print "</dd>"
+
             # Picked off's, listed in game order.
             if t.pickedoff != 0:
                 print "<dt>PO:&nbsp;</dt>"
@@ -760,37 +763,36 @@ class BoxPrinter:
                     p = t.players[pID]
                     pickedoffs = [e for e in p.events if e.type == 'pickedoff']
                     picked = t.players[pID].hitting.picked
-                    
+
                     write(pID + " ")
-                    
+
                     if picked != 1:
                         write(str(picked) + " ")
-                                    
+
                     write("(")
-                    
+
                     for e in pickedoffs:
                         write(e.base + " base by " + e.picker)
                         if e != pickedoffs[-1]:
                             write(", ")
                         else:
                             write(")")
-                    
+
                     if pID != t.players_pickedoff[-1]:
                         write(", ")
                     else:
                         write(".")
-                print "</dd>"                                       
-            
-            
+                print "</dd>"
+
             print "</dl>"
-                
+
         print
-        
+
         if t.intp != 0 or t.indp != 0 or t.players_with_pb != [] or \
         t.errs != 0 or t.players_with_pickoffs != []:
             print "<h4>Fielding</h4>"
             print "<dl>"
-            
+
             # Errors, listed in game order.
             if t.errs != 0:
                 print "<dt>E:&nbsp;</dt>"
@@ -801,31 +803,32 @@ class BoxPrinter:
                         write(pID + " " + str(error))
                     else:
                         write(pID)
-                        
+
                     write(" (" + printErrors(self.BATTERS_DB, \
                           self.PITCHERS_DB, str(t.players[pID].name), \
                           int(t.players[pID].date)) + ")")
-                    
-                    # VERY COMPLEX TO DO TYPES and what to do if type is 
-                    # unspecified for one of a player's errors and not the 
-                    # other?  Looks bad.  
-                    #errors = [y for y in t.players[pID].events \ 
+
+                    # VERY COMPLEX TO DO TYPES and what to do if type is
+                    # unspecified for one of a player's errors and not the
+                    # other?  Looks bad.
+                    # errors = [y for y in t.players[pID].events \
                     #          if y.type == 'error']
                     #
                     #textBlocks = []
                     #for e in errors:
-                    #    textBlocks.append(parseErrors(e.narrative,e.numErrors))
+                    #    textBlocks.append(parseErrors(e.narrative,
+                    #                                  e.numErrors))
                     #    if textBlocks != [None]:
                     #        for block in enumerate(textBlocks):
-                    #            
-                    #        write(" ("+text+")") 
-                     
+                    #
+                    #        write(" ("+text+")")
+
                     if pID != t.players_with_errors[-1]:
                         write(", ")
                     else:
                         write(".")
                 print "</dd>"
-    
+
             # Passed balls, listed in game order.
             if t.players_with_pb != []:
                 print "<dt>PB:&nbsp;</dt>"
@@ -836,17 +839,20 @@ class BoxPrinter:
                         write(pID + " " + str(pb))
                     else:
                         write(pID)
-                        
-                    write(" (" + printPassedBalls(self.BATTERS_DB, str(t.players[pID].name), int(t.players[pID].date)) + ")")
-                        
+
+                    write(" (" + printPassedBalls(self.BATTERS_DB,
+                                                  str(t.players[pID].name),
+                                                  int(t.players[pID].date))
+                          + ")")
+
                     if pID != t.players_with_pb[-1]:
                         write(", ")
                     else:
                         write(".")
                 print "</dd>"
-                
+
             # Outfield assists, listed in game order.
-            if len(t.outfielders_with_assists) != 0:        
+            if len(t.outfielders_with_assists) != 0:
                 print "<dt>Outfield assists:&nbsp;</dt>"
                 print "<dd>",
                 for pID in t.outfielders_with_assists:
@@ -859,8 +865,8 @@ class BoxPrinter:
                         write(".")
                     else:
                         write(", ")
-                print "</dd>"                
-                            
+                print "</dd>"
+
             # Double plays, listed in game order.
             if t.indp != 0:
                 print "<dt>DP:&nbsp;</dt>"
@@ -875,7 +881,7 @@ class BoxPrinter:
                     if string.find('unassisted') != -1:
                         for k, v in e.dpdict.iteritems():
                             poslist.append(k)
-                    else:            
+                    else:
                         string = string.replace(';', '')
                         string = string.replace(',', '')
                         string = string.replace('.', '')
@@ -884,7 +890,7 @@ class BoxPrinter:
                         for z, v in enumerate(string):
                             if v == 'to':
                                 list.append(z)
-                        #FIXME: Use Regular Expressions Here Instead' 
+                        # FIXME: Use Regular Expressions Here Instead'
                         popped = 0
                         for z in list:
                             a = string[z - 1 - popped]
@@ -895,12 +901,12 @@ class BoxPrinter:
                             and b != 'c' and b != '1b' and b != '2b' and \
                             b != '3b' and b != 'ss' and b != 'lf' and \
                             b != 'cf' and b != 'rf':
-                                string.pop(z - popped)                            
+                                string.pop(z - popped)
                                 popped += 1
                         list = []
                         for z, v in enumerate(string):
                             if v == 'to':
-                                list.append(z)                            
+                                list.append(z)
                         for z in list:
                             poslist.append(string[z - 1])
                             if z == list[-1]:
@@ -915,7 +921,7 @@ class BoxPrinter:
                             else:
                                 write(').')
                 print "</dd>"
-                
+
             # Triple Plays, listed in game order.
             if t.intp != 0:
                 print "<dt>TP:&nbsp;</dt>"
@@ -930,7 +936,7 @@ class BoxPrinter:
                     if string.find('unassisted') != -1:
                         for k, v in e.tpdict.iteritems():
                             poslist.append(k)
-                    else:              
+                    else:
                         string = string.replace(';', '')
                         string = string.split()
                         list = []
@@ -950,7 +956,7 @@ class BoxPrinter:
                                 write(', ')
                             else:
                                 write(').')
-                print "</dd>" 
+                print "</dd>"
 
             #FIXME: Pickoffs, listed in game order.
             if t.players_with_pickoffs != []:
@@ -960,29 +966,28 @@ class BoxPrinter:
                     p = t.players[pID]
                     pickoffs = [e for e in p.events if e.type == 'pickoff']
                     picks = t.players[pID].fielding.picks
-                    
+
                     write(pID + " ")
-                    
+
                     if picks != 1:
                         write(str(picks) + " ")
-                                    
+
                     write("(")
-                    
+
                     for e in pickoffs:
                         write(e.runner + " at " + e.base + " base")
                         if e != pickoffs[-1]:
                             write(", ")
                         else:
                             write(")")
-                    
+
                     if pID != t.players_with_pickoffs[-1]:
                         write(", ")
                     else:
                         write(".")
-                print "</dd>"                                       
-            
-            
-            print "</dl>"                                         
+                print "</dd>"
+
+            print "</dl>"
 
     def printBox(self, away, home, game, filename):
         consoleOutputAddress = sys.stdout
@@ -990,7 +995,7 @@ class BoxPrinter:
         sys.stdout = open(dirname + \
                           os.path.basename(filename).split('.')[0].lower() + \
                           '.htm', 'w')
-        
+
         print "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\""
         print "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
         print "<html xmlns=\"http://www.w3.org/1999/xhtml\">"
@@ -1006,7 +1011,7 @@ class BoxPrinter:
         utf-8\"/>"
         print "</head>"
         print
-        print "<body>"  
+        print "<body>"
         print "<div id=\"wrapper\">"
         print
         print "<div id=\"header\">"
@@ -1014,13 +1019,13 @@ class BoxPrinter:
                          game.homename + " " + str(home.runs) + "</h1>\n")
         sys.stdout.write("<h3>" + game.stadium + ", " + game.location + "<br>\
                          </h3>\n")
-        
+
         date = int(game.date.strftime("%Y%m%d" + str(game.dhgame)))
         awayRecord = printTeamRecord(self.WL_DB, away.id, date)
         homeRecord = printTeamRecord(self.WL_DB, home.id, date)
         awayStreak = printTeamStreak(self.WL_DB, away.id, date)
         homeStreak = printTeamStreak(self.WL_DB, home.id, date)
-        
+
         sys.stdout.write("<p id=\"awayteam\">" + away.name + " (" + awayRecord\
                          + ")<br/>" + awayStreak + "</p>\n")
         sys.stdout.write("<p id=\"hometeam\">" + home.name + " (" + homeRecord\
@@ -1040,7 +1045,7 @@ class BoxPrinter:
         print "<div id=\"batting_right\">"
         self.printBattingTable(home)
         print
-        self.printBattingParagraph(home)        
+        self.printBattingParagraph(home)
         print "</div>"
         print "</div>"
         print
@@ -1054,7 +1059,7 @@ class BoxPrinter:
         print "</div>"
         print "</div> <!--PITCHING CONTAINER-->"
         print
-        print "<div id=\"pitching_game_container\">"        
+        print "<div id=\"pitching_game_container\">"
         self.printPitchingParagraph([away, home], game)
         print "</div>"
         print
@@ -1069,17 +1074,17 @@ class BoxPrinter:
         print "</body>"
         print "</html>"
         sys.stdout = consoleOutputAddress
-        
-        
+
+
 class PlayByPlayPrinter:
-    
+
     def printLinescore(self, linescore):
         print "<table id=\"linescore\">"
         self.printLineHeader(len(linescore[0].line))
         self.printLine(linescore[0])
         self.printLine(linescore[1])
         print "</table>"
-        
+
     def printLineHeader(self, num_inn):
         print "<tr>",
         sys.stdout.write("<th></th>")
@@ -1087,7 +1092,7 @@ class PlayByPlayPrinter:
             sys.stdout.write("<th>%s</th>" % i)
         print "<th></th><th>R</th><th>H</th><th>E</th>",
         print "</tr>"
-        
+
     def printLine(self, t):
         print "<tr>",
         sys.stdout.write("<td>" + t.name + "</td>"),
@@ -1098,14 +1103,14 @@ class PlayByPlayPrinter:
                 sys.stdout.write("<td>%s</td>" % x)
         print "<td></td><td class=\"score\">%(r)2d</td><td>%(h)2d</td>\
                <td>%(e)2d</td>" % {'r': t.runs, 'h': t.hits, 'e': t.errs},
-        print "</tr>"    
-    
-    def printPlayByPlay(self, gameData, filename):    
+        print "</tr>"
+
+    def printPlayByPlay(self, gameData, filename):
         consoleOutputAddress = sys.stdout
         dirname = os.path.dirname(filename) + '/HTML/'
-	basename = os.path.basename(filename).split('.')[0].lower()
+        basename = os.path.basename(filename).split('.')[0].lower()
         sys.stdout = open(dirname + basename + '_pbp.htm', 'w')
-        
+
         print "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\""
         print "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
         print "<html xmlns=\"http://www.w3.org/1999/xhtml\">"
@@ -1122,7 +1127,7 @@ class PlayByPlayPrinter:
               content=\"text/html;charset=utf-8\" />"
         print "</head>"
         print
-        print "<body>"  
+        print "<body>"
         print "<div id=\"wrapper\">"
         print
         print "<div id=\"header\">"
@@ -1132,7 +1137,7 @@ class PlayByPlayPrinter:
                          str(gameData.linescore[1].runs) + "</h1>\n")
         sys.stdout.write("<h3>" + gameData.stadium + ", " + \
                          gameData.location + "</h3>\n")
-        
+
         gameData.linescore[1].name = gameData.visitorShortName
         gameData.linescore[0].name = gameData.homeShortName
         self.printLinescore(gameData.linescore)
@@ -1141,7 +1146,7 @@ class PlayByPlayPrinter:
         print "<table id=\"playbyplay\">"
         for inningNumber, eachInning in enumerate(gameData.innings):
             for top, eachHalf in enumerate(eachInning.halfs):
-                
+
                 if top:
                     print "<tr class=\"visitor\"><td>"
                     print gameData.visitorShortName + ' - Bottom of ' + \
@@ -1149,7 +1154,7 @@ class PlayByPlayPrinter:
                 else:
                     print "<tr class=\"home\"><td>"
                     print gameData.homeShortName + ' - Top of ' + \
-                          prettyInning(inningNumber + 1)              
+                          prettyInning(inningNumber + 1)
                 print "</td><td class=\"score_header\" colspan=2>SCORE</td>\
                        </tr>"
                 print "<tr class=\"wrap\"><td>"
@@ -1158,12 +1163,12 @@ class PlayByPlayPrinter:
                           gameData.homeShortName
                 else:
                     print eachHalf.pitcherStartingInning + ' pitching for ' + \
-                          gameData.visitorShortName                 
-                
+                          gameData.visitorShortName
+
                 print "</td><td class=\"runs\">" + gameData.visid + \
                       "</td><td class=\"runs\">" + gameData.homeid + \
                       "</td></tr>"
-                
+
                 correction = 0
                 for on, eachEvent in enumerate(eachHalf.events):
                     if eachEvent.text == 'No play.':
@@ -1184,10 +1189,10 @@ class PlayByPlayPrinter:
                         edText = edText.replace('center field', 'center')
                         edText = edText.replace('right field', 'right')
                         edText = edText.replace('advanced to', 'to')
-                        
+
                         if edText.find('/  for') != -1:
                             edText = 'Designated Hitter Terminated.'
-                        
+
                         try:
                             edText = edText.replace('to p for', 'relieved ' + \
                                      eachEvent.leavingPitcher + '.')
@@ -1201,23 +1206,25 @@ class PlayByPlayPrinter:
                         except AttributeError:
                             edText = edText.replace('to p.', 'to pitcher.')
                         edText = edText.replace(' p ', ' pitcher ')
-                        
-                        for eachError in eachEvent.errorFielders:   
+
+                        for eachError in eachEvent.errorFielders:
                             name = eachEvent.errorFielders[eachError]
                             edText = edText.replace('by p', 'by pitcher ' + \
                                                     name)
                             edText = edText.replace('by 1b', \
                                                     'by first baseman ' + name)
-                            edText = edText.replace('by 2b', \
-                                                    'by second baseman ' + name)
+                            edText = edText.replace('by 2b',
+                                                    'by second baseman ' +
+                                                    name)
                             edText = edText.replace('by 3b', \
                                                     'by third baseman ' + name)
                             edText = edText.replace('by ss', \
                                                     'by shortstop ' + name)
                             edText = edText.replace('by lf', \
                                                     'by left fielder ' + name)
-                            edText = edText.replace('by cf', \
-                                                    'by center fielder ' + name)
+                            edText = edText.replace('by cf',
+                                                    'by center fielder '
+                                                    + name)
                             edText = edText.replace('by rf', \
                                                     'by right fielder ' + name)
                             edText = edText.replace('by c ', \
@@ -1226,7 +1233,7 @@ class PlayByPlayPrinter:
                                                     'by catcher ' + name + '.')
                             edText = edText.replace('by c,', \
                                                     'by catcher ' + name + ',')
-                                                
+
                         edText = edText.replace('to c.', 'to catcher.')
                         edText = edText.replace('to c ', 'to catcher ')
                         edText = edText.replace(' 1b', ' first')
@@ -1236,9 +1243,9 @@ class PlayByPlayPrinter:
                         edText = edText.replace(' lf', ' left')
                         edText = edText.replace(' cf', ' center')
                         edText = edText.replace(' rf', ' right')
-                        
+
                         edText = edText.replace('double play', 'double play,')
-                        
+
                         if eachEvent.type == 'SUB':
                             edText = edText.replace('to first', 'at first')
                             edText = edText.replace('to second', 'at second')
@@ -1248,13 +1255,13 @@ class PlayByPlayPrinter:
                             edText = edText.replace('to left', 'in left')
                             edText = edText.replace('to center', 'in center')
                             edText = edText.replace('to right', 'in right')
-                            
+
                         print edText
                         print "</td><td class=\"runs\">"
                         print str(eachEvent.scoreVisitor) + \
                               "</td><td class=\"runs\">" + \
-                              str(eachEvent.scoreHome)           
-                        print "</td></tr>" 
+                              str(eachEvent.scoreHome)
+                        print "</td></tr>"
                 print "<tr class=\"wrap\"><td colspan=3>"
                 if eachHalf.runs == '1':
                     print eachHalf.runs + " Run, "
@@ -1269,9 +1276,9 @@ class PlayByPlayPrinter:
                 else:
                     print eachHalf.errors + " Errors, "
                 print eachHalf.leftonbase + " LOB"
-                print "</td></tr>"                                   
+                print "</td></tr>"
         print "</table>"
         print "</div>"
         print "</body>"
-        print "</html>"        
+        print "</html>"
         sys.stdout = consoleOutputAddress

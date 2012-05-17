@@ -5,6 +5,7 @@ from team2 import *
 import copy
 import datetime
 
+
 class parsePlayByPlay(saxutils.handler.ContentHandler):
     def __init__(self, gameData):
         # The home and away teams
@@ -17,25 +18,27 @@ class parsePlayByPlay(saxutils.handler.ContentHandler):
         self.activeSub = 0
         self.curPitcher = ''
         self.playHasOccurred = -1
-        
+
     def startElement(self, name, attrs):
         if (name == 'venue'):
             self.gameData.stadium = attrs.get('stadium')
-            self.gameData.location = attrs.get('location')            
+            self.gameData.location = attrs.get('location')
             date = attrs.get('date').split('/')
-            self.gameData.date = datetime.date(int(date[2]),int(date[0]),int(date[1]))
+            self.gameData.date = datetime.date(int(date[2]), int(date[0]),
+                                               int(date[1]))
             self.gameData.visitorLongName = attrs.get('visname')
             self.gameData.homeLongName = attrs.get('homename')
             self.gameData.visid = attrs.get('visid')
             self.gameData.homeid = attrs.get('homeid')
-            longNames = [self.gameData.visitorLongName, self.gameData.homeLongName]
+            longNames = [self.gameData.visitorLongName,
+                         self.gameData.homeLongName]
             for first, name in enumerate(longNames):
                 if name == 'Vienna Senators':
                     name = 'Vienna'
                 elif name == 'Carney Pirates':
                     name = 'Carney'
                 elif name == 'S Maryland Cardinals':
-                    name =  'Southern Maryland'                   
+                    name = 'Southern Maryland'
                 elif name == 'Fairfax Nationals':
                     name = 'Fairfax'
                 elif name == 'DC Grays':
@@ -43,9 +46,9 @@ class parsePlayByPlay(saxutils.handler.ContentHandler):
                 elif name == 'Beltway Blue Caps':
                     name = 'Beltway'
                 elif name == 'McLean Raiders':
-                    name = 'McLean'                                                                                
+                    name = 'McLean'
                 elif name == 'Arlington Diamonds':
-                    name = 'Arlington'                                                                                
+                    name = 'Arlington'
                 elif name == 'Gaithersburg Giants':
                     name = 'Gaithersburg'
                 elif name == 'Western HC Renegades':
@@ -59,9 +62,9 @@ class parsePlayByPlay(saxutils.handler.ContentHandler):
                 # elif name == 'MD Black Barons':
                 #    name = 'Maryland'
                 #elif name == 'Maryland Nationals':
-                #    name = 'Maryland'                   
+                #    name = 'Maryland'
                 #elif name == 'Maryland Orioles':
-                #    name = 'Maryland' 
+                #    name = 'Maryland'
                 if first:
                     self.gameData.visitorShortName = name
                 else:
@@ -73,7 +76,7 @@ class parsePlayByPlay(saxutils.handler.ContentHandler):
             line.hits = int(attrs.get('hits'))
             line.errs = int(attrs.get('errs'))
             line.lob = int(attrs.get('lob'))
-            self.gameData.linescore.append(line)                            
+            self.gameData.linescore.append(line)
         elif (name == 'plays'):
             self.inPlays = 1
         elif (name == 'inning'):
@@ -84,12 +87,12 @@ class parsePlayByPlay(saxutils.handler.ContentHandler):
             self.curInning.halfs.append(self.curHalf)
             self.firstPlay = 1
             self.playHasOccurred = -1
-            if attrs.get('vh')=='V':
+            if attrs.get('vh') == 'V':
                 self.topHalf = 1
             else:
                 self.topHalf = 0
         elif (name == 'play'):
-            self.curEvent = Event(self.visitorScore,self.homeScore)
+            self.curEvent = Event(self.visitorScore, self.homeScore)
             self.curHalf.events.append(self.curEvent)
             if self.firstPlay == 1:
                 self.curHalf.pitcherStartingInning = attrs.get('pitcher')
@@ -98,8 +101,8 @@ class parsePlayByPlay(saxutils.handler.ContentHandler):
         elif (name == 'sub'):
             if attrs.get('pos') == 'p':
                 self.curEvent.type = 'RELIEVER'
-                if attrs.get('for',0) == 0:
-                        self.curEvent.leavingPitcher = self.curPitcher                
+                if attrs.get('for', 0) == 0:
+                        self.curEvent.leavingPitcher = self.curPitcher
                 if self.playHasOccurred == -1:
                     self.curHalf.pitcherStartingInning = attrs.get('who')
                 if self.curPitcher == '/':
@@ -108,26 +111,27 @@ class parsePlayByPlay(saxutils.handler.ContentHandler):
             else:
                 self.curEvent.type = 'SUB'
             self.activeSub = 1
-            
+
         elif (name == 'batter'):
             self.activeSub = 0
             self.playHasOccurred = 1
-            if attrs.get('scored',0) != 0:
+            if attrs.get('scored', 0) != 0:
                 self.curEvent.type = 'SCORING'
                 if self.topHalf:
                     self.visitorScore += 1
                 else:
                     self.homeScore += 1
         elif (name == 'runner'):
-            if attrs.get('scored',0) != 0:
-                self.curEvent.type = 'SCORING'            
+            if attrs.get('scored', 0) != 0:
+                self.curEvent.type = 'SCORING'
                 if self.topHalf:
                     self.visitorScore += 1
                 else:
                     self.homeScore += 1
         elif (name == 'fielder'):
-            if (attrs.get('e',0) != 0):
-                self.curEvent.errorFielders[attrs.get('pos')] = attrs.get('name')
+            if (attrs.get('e', 0) != 0):
+                self.curEvent.errorFielders[attrs.get('pos')] = \
+                        attrs.get('name')
         elif (name == 'narrative'):
             self.curEvent.text = attrs.get('text')
         elif (name == 'innsummary'):
@@ -143,4 +147,3 @@ class parsePlayByPlay(saxutils.handler.ContentHandler):
             self.firstPlay = -1
             self.curEvent.scoreHome = self.homeScore
             self.curEvent.scoreVisitor = self.visitorScore
-            
